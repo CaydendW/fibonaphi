@@ -1,0 +1,8 @@
+# The compiled executable
+fibonaphi
+
+# Build files
+*.o
+
+# Editor specific files
+compile_flags.txt
