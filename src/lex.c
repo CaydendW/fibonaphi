@@ -6,23 +6,21 @@
 #include <lex.h>
 #include <token_type.h>
 
-static inline int is_num(char *buffer, int length) {
-  for (int i = 0; i < length; i++) {
-    if (!isdigit(buffer[i]) || buffer[i] != '.')
+static inline int is_num(char *buffer, size_t length) {
+  for (size_t i = 0; i < length; i++)
+    if (!isdigit(buffer[i]) && buffer[i] != '.')
       return 0;
-  }
   return 1;
 }
 
-static inline int is_identifier(char *buffer, int length) {
-  for (int i = 0; i < length; i++) {
+static inline int is_identifier(char *buffer, size_t length) {
+  for (size_t i = 0; i < length; i++)
     if (!isalpha(buffer[i]))
       return 0;
-  }
   return 1;
 }
 
-static inline int identify(char *buffer, int length) {
+static inline int identify(char *buffer, size_t length) {
   if (strncmp(buffer, "", length) == 0)
     return T_INVALID;
 
@@ -111,8 +109,8 @@ token_program_t lex(FILE *in) {
       while (ch != '\n')
         ch = fgetc(in);
 
-      add_token(&program, token_length, columns - token_length, lines,
-                T_NEWLINE, token_buffer);
+      /* add_token(&program, token_length, columns - token_length, lines, */
+      /* T_NEWLINE, token_buffer); */
     }
 
     else if (ch == '"') {
@@ -171,8 +169,8 @@ token_program_t lex(FILE *in) {
     free(duplicate);
 
     if (ch == '\n') {
-      add_token(&program, token_length, columns - token_length, lines,
-                T_NEWLINE, token_buffer);
+      /* add_token(&program, token_length, columns - token_length, lines, */
+      /* T_NEWLINE, token_buffer); */
       lines++;
       columns = 1;
     } else

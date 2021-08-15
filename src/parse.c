@@ -26,14 +26,6 @@ static inline void parse_die_expect(token_program_t *program,
           program->tokens[program->index].line,
           program->tokens[program->index].column);
 
-  for (size_t i = program->tokens[program->index].line;
-       i < program->tokens[program->index].line + 1; i++)
-    if (program->tokens[i].line == program->tokens[program->index].line)
-      fprintf(stderr, "%.*s", (int)program->tokens[i].length,
-              program->tokens[i].buffer);
-
-  puts("\n");
-
   exit(1);
 }
 
@@ -49,13 +41,52 @@ static inline int parse_eat(token_program_t *program, size_t expected_type) {
   return 0;
 }
 
-static inline int parse_detect_type(token_program_t *program) {
-  size_t curr_line_tokens;
-  for (curr_line_tokens = program->tokens[program->index].line;
-       curr_line_tokens < program->tokens[program->index].line + 1;
-       curr_line_tokens++)
+static inline int parse_token_in_line(token_program_t *program, size_t type) {
+  size_t curr_line = program->tokens[program->index].line;
+
+  size_t base_token_index;
+  for (base_token_index = 0; base_token_index + program->index < curr_line + 1;
+       base_token_index++)
     ;
 
+  size_t curr_line_tokens;
+  for (curr_line_tokens = program->index - base_token_index;
+       curr_line_tokens < program->index - base_token_index; curr_line_tokens++)
+    ;
+
+  for (size_t i = program->index - (curr_line_tokens - base_token_index);
+       program->tokens[i].line < curr_line + 1; i++)
+    if (program->tokens[i].type == type)
+      return 1;
+
+  return 0;
+}
+
+static inline int parse_detect_type(token_program_t *program) {
+  if (parse_token_in_line(program, T_EQUAL)) {
+    if (parse_token_in_line(program, T_LEFTPAREN) &&
+        parse_token_in_line(program, T_RIGHTPAREN))
+      return A_ASSIGN_FUNC;
+    else if (parse_token_in_line(program, T_LEFTBRACKET) &&
+             parse_token_in_line(program, T_RIGHTPAREN))
+      return A_ASSIGN_MATRIX;
+    else
+      return A_ASSIGN_VAR;
+  } else {
+    if (parse_token_in_line(program, T_LEFTPAREN) &&
+        parse_token_in_line(program, T_RIGHTPAREN))
+      return A_CALL_FUNC;
+    else if (parse_token_in_line(program, T_LEFTBRACKET) &&
+             parse_token_in_line(program, T_RIGHTPAREN))
+      return A_CALL_MATRIX;
+    else
+      return A_CALL_VAR;
+  }
+
+  return T_INVALID;
+}
+
+void parse_assign_function(token_program_t *program, parsed_t parsed) {
 
 }
 
@@ -64,10 +95,11 @@ parsed_t parse(token_program_t program) {
       (parsed_t){.node_count = 0, .nodes = malloc(sizeof(node_t))};
 
   while (program.index < program.token_count) {
-    if (parse_eat(&program, T_IDENTIFIER)) {
-
-    } else
-      parse_die_expect(&program, T_IDENTIFIER);
+    switch (parse_detect_type(&program)) {
+      case A_ASSIGN_FUNC:
+        parse_assign_function(&program, parsed);
+        break;
+    }
   }
 
   return parsed;

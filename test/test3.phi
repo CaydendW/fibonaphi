@@ -1,2 +1,1 @@
-print
-print
+print hi(1)

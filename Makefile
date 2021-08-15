@@ -1,13 +1,21 @@
 LD = gcc
 CC = gcc
 
-CFLAGS := \
+# CFLAGS := \
 	-Isrc/include \
 	-Wall \
 	-Wextra \
 	-Werror \
 	-std=gnu99 \
 	-O3 \
+
+CFLAGS := \
+	-Isrc/include \
+	-Wall \
+	-Wextra \
+	-Werror \
+	-std=gnu99 \
+	-g \
 
 CFILES := $(shell find src/ -name '*.c')
 OFILES := $(CFILES:.c=.o)

@@ -4,10 +4,14 @@
 #include <stddef.h>
 
 enum {
-  A_FUNC,
-  A_VAR,
-  A_MATRIX,
-  A_EXPR,
+  A_ASSIGN_FUNC,
+  A_ASSIGN_VAR,
+  A_ASSIGN_MATRIX,
+
+  A_CALL_FUNC,
+  A_CALL_VAR,
+  A_CALL_MATRIX,
+
   A_STATEMENT,
 };
 
